@@ -1,0 +1,72 @@
+package com.sinoway.monitor.controller;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@Controller
+public class GetIdController {
+	@RequestMapping(value = "/getId", method = RequestMethod.GET, produces = "application/html;charset=UTF-8")
+	@ResponseBody
+	public String test2(@RequestParam(value = "ename", required = false) String ename) throws IOException{
+		System.out.println(ename);
+		String urlStr = URLEncoder.encode(ename, "UTF-8");
+		System.out.println("http://www.tianyancha.com/search?key="+urlStr);
+		String url="http://www.tianyancha.com/search?key="+urlStr;
+		String content = getAjaxCotnent(url);
+	    assert  content != null;
+	    System.out.println(content);
+	    try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	   // String content="http://www.tianyancha.com/company/26872370";
+	    String eid=getId(content);
+	    System.out.println(eid);
+		return "eid";
+	}
+	
+
+	private static String getId(String content) throws IOException {
+
+	    Runtime rt = Runtime.getRuntime();
+        Process p = rt.exec("C:\\Users\\dell\\Downloads\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe C:\\Users\\dell\\Desktop\\useragent2.js"+" "+content);
+        InputStream is = p.getInputStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        StringBuffer sbf = new StringBuffer();
+        String tmp = "";
+        while((tmp = br.readLine())!=null){
+            sbf.append(tmp);
+        }
+        //System.out.println(sbf.toString());
+        return sbf.toString();
+
+		
+	}
+
+	private static String getAjaxCotnent(String string) throws IOException {
+		    Runtime rt = Runtime.getRuntime();
+	        Process p = rt.exec("C:\\Users\\dell\\Downloads\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe C:\\Users\\dell\\Desktop\\useragent.js "+" "+string);
+	        InputStream is = p.getInputStream();
+	        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+	        StringBuffer sbf = new StringBuffer();
+	        String tmp = "";
+	        while((tmp = br.readLine())!=null){
+	            sbf.append(tmp);
+	        }
+	        //System.out.println(sbf.toString());
+	        return sbf.toString();
+	}
+}
